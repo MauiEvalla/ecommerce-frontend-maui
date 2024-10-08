@@ -4,11 +4,8 @@ import AddProduct from '../components/AddProduct.vue';
 import AdminView from '../components/AdminView.vue';
 import ProductDetails from '../components/ProductDetails.vue';
 import Cart from '../components/Cart.vue'; 
-
-
-
-
-
+import Login from '../components/Login.vue';
+import Register from '../components/Register.vue';
 const routes = [
   {
     path: '/',
@@ -29,6 +26,18 @@ const routes = [
     path: '/product/:id',
     name: 'ProductDetails',
     component: ProductDetails,
+    props: true,
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: Login,
+    props: true,
+  },
+  {
+    path: '/register',
+    name: 'Register',
+    component: Register,
     props: true,
   },
   {

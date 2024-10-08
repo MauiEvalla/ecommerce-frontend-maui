@@ -104,7 +104,7 @@
 
 <script>
 import Swal from 'sweetalert2';
-import HeaderBar from '@/components/header/Header.vue';
+import HeaderBar from '@/components/Header/Header.vue';
 import NavBar from '@/components/Navbar/Navbar.vue';
 
 export default {
