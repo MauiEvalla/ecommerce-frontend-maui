@@ -155,7 +155,7 @@ export default {
   methods: {
     async fetchCategories() {
       try {
-        const response = await axios.get('/API/category/getAllCategories');
+        const response = await axios.get('https://ecommerce-backend-sage-eight.vercel.app/api/category/');
         this.categories = response.data.allCategories;
       } catch (error) {
         console.error('Error fetching categories:', error);
@@ -221,7 +221,7 @@ export default {
           inStock: this.inStock,
         };
 
-        const response = await fetch('/API/product/addProduct', {
+        const response = await fetch('https://ecommerce-backend-sage-eight.vercel.app/api/product/addProduct', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

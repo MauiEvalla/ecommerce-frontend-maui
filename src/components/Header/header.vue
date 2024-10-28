@@ -46,21 +46,24 @@ export default {
       const query = event.target.value;
       this.$emit('search-query', query);
     },
-    goToCart() {
-     this.$router.push({ name: 'Cart' }); // This will navigate to the Cart route
-   },
-    // Load cart count from localStorage
-    loadCartCount() {
-      const cart = JSON.parse(localStorage.getItem('cart')) || [];
-      this.cartCount = cart.reduce((sum, item) => sum + item.quantity, 0); // Calculate total items in the cart
-    },
+    async loadCartCount() {
+    try {
+      const response = await axios.get('/cart');
+      this.cartCount = response.data.items.reduce((sum, item) => sum + item.quantity, 0);
+    } catch (error) {
+      console.error('Failed to load cart count:', error);
+    }
   },
-  mounted() {
-    this.loadCartCount(); // Load the cart count when the component is mounted
-    window.addEventListener('storage', this.loadCartCount); // Listen for changes to the cart in other parts of the app
+  goToCart() {
+    this.$router.push({ name: 'Cart' });
   },
-  beforeDestroy() {
-    window.removeEventListener('storage', this.loadCartCount); // Clean up the event listener
-  },
+},
+mounted() {
+  this.loadCartCount();
+  window.addEventListener('storage', this.loadCartCount);
+},
+beforeDestroy() {
+  window.removeEventListener('storage', this.loadCartCount);
+}
 };
 </script>

@@ -104,7 +104,7 @@
 
 <script>
 import Swal from 'sweetalert2';
-import HeaderBar from '@/components/Header/Header.vue';
+import HeaderBar from '@/components/Header/header.vue';
 import NavBar from '@/components/Navbar/Navbar.vue';
 
 export default {
@@ -147,7 +147,7 @@ export default {
     },
     async fetchProducts() {
       try {
-        let url = '/API/product/Products';
+        let url = 'https://ecommerce-backend-sage-eight.vercel.app/api/product';
         if (this.searchQuery) {
           url += `?searchQuery=${encodeURIComponent(this.searchQuery)}`;
         }
@@ -168,7 +168,7 @@ export default {
     },
     async fetchCategories() {
       try {
-        const response = await fetch('/API/category/getAllCategories');
+    const response = await fetch('https://ecommerce-backend-sage-eight.vercel.app/api/category/');
         const data = await response.json();
         this.categories = data.allCategories;
       } catch (error) {
@@ -176,7 +176,7 @@ export default {
         Swal.fire({
           icon: 'error',
           title: 'Error',
-          text: 'Failed to fetch categories',
+          text: "Failed to fetch Categories "+error,
         });
       }
     },
@@ -198,23 +198,56 @@ export default {
       }, 3000);
     },
     // Add to Cart logic
-    addToCart(product) {
-      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    async addToCart(product) {
+  try {
+    // Get the token from localStorage to authorize the request
+    const token = localStorage.getItem("authToken");
 
-      const productInCart = cart.find(item => item._id === product._id);
-      if (productInCart) {
-        productInCart.quantity += 1; // If product exists, increase the quantity
-      } else {
-        cart.push({ ...product, quantity: 1 }); // If not, add the product with quantity 1
-      }
+    if (!token) {
+      return Swal.fire({
+        icon: 'error',
+        title: 'Not Logged In',
+        text: 'Please log in to add products to the cart.',
+      });
+    }
 
-      localStorage.setItem('cart', JSON.stringify(cart));
+    // Send a request to add the item to the cart using the API
+    const response = await fetch('https://ecommerce-backend-sage-eight.vercel.app/api/cart/addItemToCart', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        productId: product._id,
+        quantity: 1, // You can adjust the quantity as needed
+      }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
       Swal.fire({
         icon: 'success',
         title: 'Added to Cart',
         text: `${product.name} has been added to your cart!`,
       });
-    },
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: data.message || 'Failed to add item to cart.',
+      });
+    }
+  } catch (error) {
+    console.error('Error adding to cart:', error);
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'An error occurred while adding the product to the cart.',
+    });
+  }
+}
   },
 };
 </script>

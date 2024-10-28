@@ -87,7 +87,7 @@
     methods: {
       async fetchProducts() { //FETCH ALL PRODUCTS
         try {
-          const response = await fetch('/API/product/Products');
+          const response = await fetch('https://ecommerce-backend-sage-eight.vercel.app/api/product');
           const data = await response.json();
           this.products = data.allProduct;
         } catch (error) {
@@ -103,7 +103,7 @@
       },
       async deleteProduct(id) { //DELETE PRODUCT
         try {
-          const response = await fetch(`/API/product/delete/${id}`, {
+          const response = await fetch(`https://ecommerce-backend-sage-eight.vercel.app/api/product/delete/${id}`, {
             method: 'DELETE',
           });
           const data = await response.json();
@@ -140,7 +140,7 @@
       },
       async editProduct() {  //EDIT PRODUCT
         try {
-          const response = await fetch(`/API/product/update/${this.selectedProduct._id}`, {
+          const response = await fetch(`https://ecommerce-backend-sage-eight.vercel.app/api/product/update/${this.selectedProduct._id}`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
