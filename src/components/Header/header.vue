@@ -34,6 +34,8 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: 'HeaderBar',
   data() {
@@ -47,23 +49,35 @@ export default {
       this.$emit('search-query', query);
     },
     async loadCartCount() {
-    try {
-      const response = await axios.get('/cart');
-      this.cartCount = response.data.items.reduce((sum, item) => sum + item.quantity, 0);
-    } catch (error) {
-      console.error('Failed to load cart count:', error);
-    }
+      try {
+        const token = localStorage.getItem('authToken');
+        if (!token) return;
+
+        const response = await axios.get('https://ecommerce-backend-sage-eight.vercel.app/api/cart/', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        // Update cart count
+        this.cartCount = response.data.items.reduce((sum, item) => sum + item.quantity, 0);
+      } catch (error) {
+        console.error('Failed to load cart count:', error);
+      }
+    },
+    goToCart() {
+      this.$router.push({ name: 'Cart' });
+    },
   },
-  goToCart() {
-    this.$router.push({ name: 'Cart' });
+  mounted() {
+    this.loadCartCount();
+    
+    // Listen for custom events to update cart count
+    this.$root.$on('cart-updated', this.loadCartCount);
   },
-},
-mounted() {
-  this.loadCartCount();
-  window.addEventListener('storage', this.loadCartCount);
-},
-beforeDestroy() {
-  window.removeEventListener('storage', this.loadCartCount);
-}
+  beforeDestroy() {
+    this.$root.$off('cart-updated', this.loadCartCount);
+  },
 };
 </script>

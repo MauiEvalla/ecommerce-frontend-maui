@@ -1,5 +1,15 @@
 <template>
   <div class="max-w-5xl mx-auto p-6 bg-white shadow-md rounded-lg">
+    <div class="mb-4">
+      <router-link to="/" class="flex items-center">
+        <img
+          src="../assets/images/icons/arrow-left-circle.svg"
+          alt="Back to Home"
+          class="w-6 h-6 mr-2"
+        />
+        <span class="text-blue-500 hover:underline">Back to Home</span>
+      </router-link>
+    </div>
     <!-- Display Product Details -->
     <div v-if="product">
       <!-- Product Image -->
