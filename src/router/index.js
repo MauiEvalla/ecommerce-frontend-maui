@@ -6,6 +6,10 @@ import ProductDetails from '../components/ProductDetails.vue';
 import Cart from '../components/Cart.vue'; 
 import Login from '../components/Login.vue';
 import Register from '../components/Register.vue';
+import AccountDashboard from '../components/User/AccountDashboard.vue';
+import MyOrders from '../components/User/MyOrders.vue';
+import MyWishlist from '../components/User/MyWishlist.vue';
+
 const routes = [
   {
     path: '/',
@@ -45,8 +49,20 @@ const routes = [
     name: 'Cart',
     component: Cart,
     props: true,
-  }
-  // Add other routes here
+  },
+    // New routes for Account Dashboard
+    { path: '/account', 
+      name: 'AccountDashboard',
+       component: AccountDashboard 
+    },
+    { path: '/account/orders',
+       name: 'MyOrders', 
+       component: MyOrders
+    },
+    { path: '/account/wishlist', 
+      name: 'MyWishlist', 
+      component: MyWishlist
+    },
 ];
 
 const router = createRouter({

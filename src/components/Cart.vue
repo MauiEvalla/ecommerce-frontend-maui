@@ -19,6 +19,12 @@
       Loading...
     </div>
 
+        <!-- No products available message -->
+    <div v-if="!loading && cart.length === 0" class="text-center text-lg font-semibold text-gray-600">
+      Cart is Empty
+    </div>
+    
+
     <!-- Cart Items -->
     <div v-if="!loading && cart.length > 0">
       <div
@@ -152,27 +158,30 @@ export default {
   },
   methods: {
     async loadCart() {
-      this.loading = true; // Set loading to true before fetch
-      try {
-        const token = localStorage.getItem('authToken');
-        const response = await fetch(
-          'https://ecommerce-backend-sage-eight.vercel.app/api/cart/',
-          {
-            method: 'GET',
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-          }
-        );
-        const data = await response.json();
-        this.cart = data.items;
-      } catch (error) {
-        console.error('Failed to load cart:', error);
-      } finally {
-        this.loading = false; // Set loading to false after fetch
-      }
-    },
+    this.loading = true; // Set loading to true before fetch
+    try {
+      const token = localStorage.getItem('authToken');
+      const response = await fetch(
+        'https://ecommerce-backend-sage-eight.vercel.app/api/cart/',
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      const data = await response.json();
+      // Ensure cart is an array even if it's null or undefined
+      this.cart = data.items || [];
+    } catch (error) {
+      console.error('Failed to load cart:', error);
+      // Initialize cart as an empty array on error as well
+      this.cart = [];
+    } finally {
+      this.loading = false; // Set loading to false after fetch
+    }
+  },
     async updateQuantity(productId, action) {
     const quantity = action === 'increase' ? 1 : -1;
     try {
