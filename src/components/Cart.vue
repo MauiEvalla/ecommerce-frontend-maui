@@ -134,13 +134,15 @@
 </template>
 
 <script>
+import Swal from "sweetalert2";
+
 export default {
   data() {
     return {
       cart: [],
-      shippingAddress: '',
-      orderAddress: '',
-      orderEmail: '',
+      shippingAddress: "",
+      orderAddress: "",
+      orderEmail: "",
       showModal: false,
       loading: true, // Added loading state
     };
@@ -158,79 +160,104 @@ export default {
   },
   methods: {
     async loadCart() {
-    this.loading = true; // Set loading to true before fetch
-    try {
-      const token = localStorage.getItem('authToken');
-      const response = await fetch(
-        'https://ecommerce-backend-sage-eight.vercel.app/api/cart/',
-        {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-      const data = await response.json();
-      // Ensure cart is an array even if it's null or undefined
-      this.cart = data.items || [];
-    } catch (error) {
-      console.error('Failed to load cart:', error);
-      // Initialize cart as an empty array on error as well
-      this.cart = [];
-    } finally {
-      this.loading = false; // Set loading to false after fetch
-    }
-  },
+      this.loading = true; // Set loading to true before fetch
+      try {
+        const token = localStorage.getItem("authToken");
+        const response = await fetch(
+          "https://ecommerce-backend-sage-eight.vercel.app/api/cart/",
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await response.json();
+        this.cart = data.items || [];
+      } catch (error) {
+        console.error("Failed to load cart:", error);
+        this.cart = [];
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Failed to load cart. Please try again later.",
+        });
+      } finally {
+        this.loading = false; // Set loading to false after fetch
+      }
+    },
     async updateQuantity(productId, action) {
-    const quantity = action === 'increase' ? 1 : -1;
-    try {
-      const token = localStorage.getItem('authToken');
-      const response = await fetch('https://ecommerce-backend-sage-eight.vercel.app/api/cart/addItemToCart', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ productId, quantity }),
-      });
-      if (!response.ok) throw new Error('Failed to update cart quantity');
-      this.loadCart();
-      this.$root.$emit('cart-updated'); // Emit the event
-    } catch (error) {
-      console.error('Failed to update cart quantity:', error);
-    }
-  },
-  
-  async removeFromCart(productId) {
-    try {
-      const token = localStorage.getItem('authToken');
-      const response = await fetch('https://ecommerce-backend-sage-eight.vercel.app/api/cart/removeItemFromCart', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ productId }),
-      });
-      if (!response.ok) throw new Error('Failed to remove item from cart');
-      this.loadCart();
-      this.$root.$emit('cart-updated'); // Emit the event
-    } catch (error) {
-      console.error('Failed to remove item from cart:', error);
-    }
-  },
+      const quantity = action === "increase" ? 1 : -1;
+      try {
+        const token = localStorage.getItem("authToken");
+        const response = await fetch(
+          "https://ecommerce-backend-sage-eight.vercel.app/api/cart/addItemToCart",
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ productId, quantity }),
+          }
+        );
+        if (!response.ok) throw new Error("Failed to update cart quantity");
+        this.loadCart();
+        this.$root.$emit("cart-updated"); // Emit the event
+      } catch (error) {
+        console.error("Failed to update cart quantity:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Failed to update cart quantity. Please try again.",
+        });
+      }
+    },
+
+    async removeFromCart(productId) {
+      try {
+        const token = localStorage.getItem("authToken");
+        const response = await fetch(
+          "https://ecommerce-backend-sage-eight.vercel.app/api/cart/removeItemFromCart",
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ productId }),
+          }
+        );
+        if (!response.ok) throw new Error("Failed to remove item from cart");
+        this.loadCart();
+        this.$root.$emit("cart-updated"); // Emit the event
+        Swal.fire({
+          icon: "success",
+          title: "Item Removed",
+          text: "The item has been successfully removed from the cart.",
+        });
+      } catch (error) {
+        console.error("Failed to remove item from cart:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Failed to remove item from cart. Please try again.",
+        });
+      }
+    },
+
     async submitOrder() {
       this.showModal = false;
       try {
-        const token = localStorage.getItem('authToken');
+        const token = localStorage.getItem("authToken");
         const response = await fetch(
-          'https://ecommerce-backend-sage-eight.vercel.app/api/order/OrderFromCart',
+          "https://ecommerce-backend-sage-eight.vercel.app/api/order/OrderFromCart",
           {
-            method: 'POST',
+            method: "POST",
             headers: {
               Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json',
+              "Content-Type": "application/json",
             },
             body: JSON.stringify({
               shippingAddress: this.shippingAddress,
@@ -242,17 +269,29 @@ export default {
 
         if (response.ok) {
           const data = await response.json();
-          console.log('Order created:', data);
-          alert('Order placed successfully!');
+          console.log("Order created:", data);
+          Swal.fire({
+            icon: "success",
+            title: "Order Placed",
+            text: "Your order has been placed successfully!",
+          });
           this.cart = [];
         } else {
           const error = await response.json();
-          console.error('Failed to place order:', error);
-          alert('Failed to place order');
+          console.error("Failed to place order:", error);
+          Swal.fire({
+            icon: "error",
+            title: "Failed to Place Order",
+            text: "An error occurred while placing your order. Please try again.",
+          });
         }
       } catch (error) {
-        console.error('Error during checkout:', error);
-        alert('Error during checkout');
+        console.error("Error during checkout:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Checkout Error",
+          text: "An error occurred during checkout. Please try again.",
+        });
       }
     },
   },

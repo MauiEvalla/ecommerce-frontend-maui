@@ -80,7 +80,7 @@ export default {
     // Save the token to local storage
     localStorage.setItem("authToken", token);
     // Redirect to the ProductList page
-    this.$router.push("/");
+    this.$router.push("/home");
   } catch (error) {
     this.errorMessage = error.response?.data?.message || "Login failed";
   }

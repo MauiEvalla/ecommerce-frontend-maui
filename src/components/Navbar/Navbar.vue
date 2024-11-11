@@ -27,7 +27,7 @@
         alt="Notifications"
         class="w-8 h-8"
       />
-      <span class="text-xs text-white">Profile</span>
+      <span class="text-xs text-white">Account</span>
     </div>
   </div>
 </template>
