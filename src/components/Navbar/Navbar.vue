@@ -1,40 +1,40 @@
 <template>
   <div class="fixed bg-amber-500 bottom-0 left-0 right-0 shadow-md py-3 flex justify-around items-center z-50">
     <!-- Home Icon -->
-    <div class="flex flex-col items-center">
+    <router-link to="/" class="flex flex-col items-center">
       <img
         src="../../assets/images/icons/home.svg"
         alt="Home"
         class="w-8 h-8"
       />
       <span class="text-xs text-white">Home</span>
-    </div>
+    </router-link>
 
-    <!-- Shopping Cart Icon -->
-    <div class="flex flex-col items-center">
+    <!-- Message Icon -->
+    <router-link to="/chat" class="flex flex-col items-center">
       <img
         src="../../assets/images/icons/chat-outline.svg"
-        alt="Cart"
+        alt="Message"
         class="w-8 h-8"
       />
       <span class="text-xs text-white">Message</span>
-    </div>
+    </router-link>
 
-    <!-- Bell Icon -->
-    <div class="flex flex-col items-center">
+    <!-- Account Icon -->
+    <router-link to="/account" class="flex flex-col items-center">
       <img
         src="../../assets/images/icons/account.svg"
-        alt="Notifications"
+        alt="Account"
         class="w-8 h-8"
       />
       <span class="text-xs text-white">Account</span>
-    </div>
+    </router-link>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'Navbar'
+  name: 'Navbar',
 };
 </script>
 

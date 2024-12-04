@@ -70,22 +70,25 @@ export default {
     };
   },
   methods: {
-    async handleLogin() {
-  try {
-    const response = await axios.post("https://ecommerce-backend-sage-eight.vercel.app/api/user/login", {
-      email: this.email,
-      password: this.password,
-    });
-    const token = response.data.token;
-    // Save the token to local storage
-    localStorage.setItem("authToken", token);
-    // Redirect to the ProductList page
-    this.$router.push("/home");
-  } catch (error) {
-    this.errorMessage = error.response?.data?.message || "Login failed";
-  }
-},
+  async handleLogin() {
+    try {
+      const response = await axios.post(
+        "https://ecommerce-backend-sage-eight.vercel.app/api/user/login",
+        {
+          email: this.email,
+          password: this.password,
+        }
+      );
+      console.log("Login response:", response.data);
+      const token = response.data.token;
+      localStorage.setItem("authToken", token);
+      this.$router.push("/home");
+    } catch (error) {
+      console.error("Login error:", error.response || error);
+      this.errorMessage = error.response?.data?.message || "Login failed";
+    }
   },
+},
 };
 </script>
 

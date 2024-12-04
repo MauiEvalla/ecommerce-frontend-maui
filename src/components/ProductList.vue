@@ -1,14 +1,13 @@
 <template>
-  <HeaderBar @search-query="filterProductsBySearch" />
+  <ShopNav @search-query="filterProductsBySearch" />
 
-  <div class="max-w-7xl mx-auto p-6 bg-gray-200">
-
-    <!-- Carousel Section for Ads -->
-    <div class="mb-8 relative">
-      <div class="absolute top-4 left-4 bg-black bg-opacity-50 px-4 py-2 rounded-md">
+  <div class="max-w-full mx-auto p-4 bg-gray-200">
+    <!-- Carousel Section -->
+    <div class="mb-4 relative">
+      <div class="absolute top-4 left-4 bg-black bg-opacity-60 px-4 py-2 rounded-md">
         <h2 class="text-white text-2xl font-semibold">Our Deals</h2>
       </div>
-      <div class="relative w-full h-64 overflow-hidden rounded-lg shadow-lg">
+      <div class="relative w-full h-48 sm:h-64 overflow-hidden rounded-md">
         <div
           class="carousel flex transition-transform duration-500 ease-in-out"
           :style="{ transform: `translateX(-${currentSlide * 100}%)` }"
@@ -16,7 +15,7 @@
           <div
             v-for="(image, index) in adImages"
             :key="index"
-            class="w-full h-64 flex-shrink-0"
+            class="w-full h-48 sm:h-64 flex-shrink-0"
           >
             <img
               :src="getImageUrl(image)"
@@ -25,7 +24,7 @@
             />
           </div>
         </div>
-        <!-- Carousel Navigation Dots -->
+        <!-- Navigation Dots -->
         <div class="absolute bottom-4 left-0 right-0 flex justify-center space-x-2">
           <span
             v-for="(image, index) in adImages"
@@ -41,92 +40,92 @@
       </div>
     </div>
 
-    <h1 class="text-4xl font-bold text-center text-gray-800 mb-8">Product List</h1>
-
-    <!-- Credit Score Section -->
-    <div class="mb-6 p-6 rounded-lg shadow-md" :class="['bg-gradient-to-r', 'from-yellow-400', 'to-orange-600']">
-      <h2 class="text-2xl font-bold text-amber-800 mb-2">20,000 Credits</h2>
-      <p>Available credits</p>
+    <!-- Credit Section -->
+    <div class="bg-white p-4 mb-4 rounded-md shadow">
+      <div class="bg-gradient-to-r from-amber-300 to-amber-600 p-6 rounded-md">
+        <h2 class="text-2xl sm:text-3xl font-bold text-amber-900 mb-1">
+          {{ creditsBalance.toLocaleString() }}
+        </h2>
+        <p class="text-gray-800">Available Credits</p>
+      </div>
     </div>
 
-    <!-- Scrollable Category Buttons -->
-    <div class="mb-6 overflow-x-auto whitespace-nowrap no-scrollbar flex space-x-4 px-2">
-      <button
-        v-for="category in categories"
-        :key="category._id"
-        @click="filterProductsByCategory(category._id)"
-        class="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-yellow-600"
+    <!-- Categories Section -->
+    <div class="bg-white p-4 mb-4 rounded-md">
+      <h3 class="text-lg font-semibold text-gray-700 mb-2">Categories</h3>
+      <div class="overflow-x-auto whitespace-nowrap no-scrollbar flex space-x-2">
+        <button
+          v-for="category in categories"
+          :key="category._id"
+          @click="filterProductsByCategory(category._id)"
+          class="px-4 py-2 bg-white border shadow text-gray-700 rounded-md hover:bg-gray-50"
+        >
+          {{ category.categoryName }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Products Section -->
+    <div
+      v-if="!loading"
+      class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4"
+    >
+      <div
+        v-for="product in filteredProducts"
+        :key="product._id"
+        class="bg-white p-4 rounded-md shadow hover:shadow-md cursor-pointer flex flex-col"
+        @click="goToProductDetails(product._id)"
       >
-        {{ category.categoryName }}
-      </button>
+        <img
+          v-if="product.image"
+          :src="product.image"
+          alt="Product Image"
+          class="w-full h-32 sm:h-48 object-cover rounded-md mb-3"
+        />
+        <h3 class="text-base sm:text-lg font-bold text-gray-800 truncate">
+          {{ product.name }}
+        </h3>
+        <p class="text-base sm:text-lg font-bold text-amber-700 mt-1">
+          ₱{{ product.price.toFixed(2) }}
+        </p>
+        <button
+          @click.stop="addToCart(product)"
+          class="mt-4 px-2 sm:px-4 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-600"
+        >
+          Add to Cart
+        </button>
+      </div>
     </div>
 
-    <!-- Loading state -->
-    <div v-if="loading" class="text-center text-lg font-semibold text-gray-600">Loading...</div>
-
-    <!-- No products available message -->
-    <div v-if="!loading && filteredProducts.length === 0" class="text-center text-lg font-semibold text-gray-600">
+    <div v-if="loading" class="text-center text-lg text-gray-600">Loading...</div>
+    <div
+      v-if="!loading && filteredProducts.length === 0"
+      class="text-center text-lg text-gray-600"
+    >
       No products available.
     </div>
+  </div>
 
- <!-- Products Grid -->
-<div v-if="!loading" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-20">
-  <div
-    v-for="product in filteredProducts"
-    :key="product._id"
-    class="bg-white p-4 rounded-lg shadow-md flex flex-col cursor-pointer"
-    @click="goToProductDetails(product._id)"
-  >
-    <img
-      v-if="product.image"
-      :src="product.image"
-      alt="Product Image"
-      class="w-full h-40 object-cover rounded-md mb-2"
-    />
-    <div class="flex-grow">
-      <h2 class="text-lg font-bold text-gray-800 mb-1">
-        {{ truncateName(product.name) }}
-      </h2>  
-      <p class="text-lg font-bold text-amber-700 mb-2">₱{{ product.price.toFixed(2) }}</p>
-    </div>
-    <!-- Add to Cart button -->
-    <button
-      @click.stop="addToCart(product)"
-      class="bg-amber-500 text-white px-4 py-2 rounded hover:bg-orange-600 mt-2"
-    >
-      Add to Cart
-    </button>
-  </div>
-</div>
-  </div>
-  <NavBar />
+  <BottomNavigation />
 </template>
 
+
 <script>
-import Swal from 'sweetalert2';
-import HeaderBar from '@/components/Header/header.vue';
-import NavBar from '@/components/Navbar/Navbar.vue';
+import Swal from "sweetalert2";
+import ShopNav from "@/components/Navbar/ShopNav.vue";
+import BottomNavigation from "@/components/Navbar/BottomNavigation.vue";
 
 export default {
-  computed: {
-    truncatedName() {
-      return this.product.name.length > 20
-        ? this.product.name.substring(0, 20) + '...'
-        : this.product.name;
-    },
-  },
-  components: {
-    HeaderBar,
-    NavBar,
-  },
+  components: { ShopNav, BottomNavigation },
   data() {
     return {
       products: [],
       filteredProducts: [],
       categories: [],
+      creditsBalance: 20000, // Example balance
       loading: true,
-      searchQuery: '',
-      adImages: ['ad1.jpg', 'ad2.jpg', 'ad3.jpg', 'ad4.jpg'],
+      searchQuery: "",
+      adImages: ["ad1.jpg", "ad2.jpg", "ad3.jpg", "ad4.jpg"],
       currentSlide: 0,
     };
   },
@@ -136,58 +135,29 @@ export default {
     this.startCarousel();
   },
   methods: {
-    truncateName(text) {
-      return text.length > 20 ? text.substring(0, 20) + '...' : text;
-    },
     getImageUrl(image) {
       return new URL(`../assets/images/ads/${image}`, import.meta.url).href;
     },
-    goToProductDetails(productId) {
-      this.$router.push({ name: 'ProductDetails', params: { id: productId } });
-    },
     async fetchProducts() {
-      try {
-        let url = 'https://ecommerce-backend-sage-eight.vercel.app/api/product';
-        if (this.searchQuery) {
-          url += `?searchQuery=${encodeURIComponent(this.searchQuery)}`;
-        }
-        const response = await fetch(url);
-        const data = await response.json();
-        this.products = data.allProduct.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        this.filteredProducts = this.products;
-      } catch (error) {
-        console.error('Error fetching products:', error);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'An error occurred while fetching products',
-        });
-      } finally {
-        this.loading = false;
-      }
+      const response = await fetch(
+        `https://ecommerce-backend-sage-eight.vercel.app/api/product?searchQuery=${encodeURIComponent(
+          this.searchQuery
+        )}`
+      );
+      const data = await response.json();
+      this.products = data.allProduct;
+      this.filteredProducts = data.allProduct;
+      this.loading = false;
     },
     async fetchCategories() {
-      try {
-    const response = await fetch('https://ecommerce-backend-sage-eight.vercel.app/api/category/');
-        const data = await response.json();
-        this.categories = data.allCategories;
-      } catch (error) {
-        console.error('Error fetching categories:', error);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: "Failed to fetch Categories "+error,
-        });
-      }
+      const response = await fetch("https://ecommerce-backend-sage-eight.vercel.app/api/category/");
+      const data = await response.json();
+      this.categories = data.allCategories;
     },
     filterProductsByCategory(categoryId) {
       this.filteredProducts = this.products.filter(
         (product) => product.categoryId === categoryId
       );
-    },
-    filterProductsBySearch(query) {
-      this.searchQuery = query;
-      this.fetchProducts();
     },
     setCurrentSlide(index) {
       this.currentSlide = index;
@@ -197,66 +167,27 @@ export default {
         this.currentSlide = (this.currentSlide + 1) % this.adImages.length;
       }, 3000);
     },
-    // Add to Cart logic
     async addToCart(product) {
-  try {
-    // Get the token from localStorage to authorize the request
-    const token = localStorage.getItem("authToken");
-
-    if (!token) {
-      return Swal.fire({
-        icon: 'error',
-        title: 'Not Logged In',
-        text: 'Please log in to add products to the cart.',
+      const token = localStorage.getItem("authToken");
+      const response = await fetch("https://ecommerce-backend-sage-eight.vercel.app/api/cart/addItemToCart", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ productId: product._id, quantity: 1 }),
       });
-    }
-
-    // Send a request to add the item to the cart using the API
-    const response = await fetch('https://ecommerce-backend-sage-eight.vercel.app/api/cart/addItemToCart', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        productId: product._id,
-        quantity: 1, // You can adjust the quantity as needed
-      }),
-    });
-
-    const data = await response.json();
-
-    if (response.ok) {
-      Swal.fire({
-        icon: 'success',
-        title: 'Added to Cart',
-        text: `${product.name} has been added to your cart!`,
-      });
-    } else {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: data.message || 'Failed to add item to cart.',
-      });
-    }
-  } catch (error) {
-    console.error('Error adding to cart:', error);
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: 'An error occurred while adding the product to the cart.',
-    });
-  }
-}
+      if (response.ok) {
+        Swal.fire("Success", `${product.name} added to cart`, "success");
+      }
+    },
   },
 };
 </script>
 
 <style scoped>
-/* Add this to your CSS file */
-@media only screen and (max-width: 768px) {
-  .grid-cols-1.sm\:grid-cols-2 {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 </style>
